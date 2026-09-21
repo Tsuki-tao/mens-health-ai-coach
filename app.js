@@ -16,6 +16,7 @@ const App = {
     Store.load();
     this.bindNav();
     this.bindGlobal();
+    this.bindSplash();
     this.renderShellInfo();
     this.navigate("dashboard");
   },
@@ -32,6 +33,20 @@ const App = {
   bindGlobal() {
     document.getElementById("hamburgerBtn").addEventListener("click", openSidebar);
     document.getElementById("sidebarOverlay").addEventListener("click", closeSidebar);
+  },
+
+  bindSplash() {
+    const splash = document.getElementById("splashScreen");
+    const enterBtn = document.getElementById("splashEnterBtn");
+    if (!splash || !enterBtn) return;
+    document.body.classList.add("no-scroll");
+    if (window.lucide) lucide.createIcons();
+    const enter = () => {
+      splash.classList.add("is-hidden");
+      document.body.classList.remove("no-scroll");
+      setTimeout(() => { splash.style.display = "none"; }, 650);
+    };
+    enterBtn.addEventListener("click", enter);
   },
 
   renderShellInfo() {
