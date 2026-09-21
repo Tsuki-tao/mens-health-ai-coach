@@ -117,6 +117,20 @@ function progressBar(percent, color) {
   return `<div class="pbar"><div class="pbar-fill pbar-fill--${color}" style="width:${p}%"></div></div>`;
 }
 
+// Compact, reusable image banner used at the top of Plan / Workout / Progress /
+// Sleep / Health Tips. Keeps every page's photo usage consistent instead of
+// hand-rolling markup per view.
+function pageHero(imageObj, eyebrow, title, sub, modifier) {
+  return `
+    <div class="page-hero${modifier ? ` page-hero--${modifier}` : ""}" style="background-image:url('${imageObj.url}')" role="img" aria-label="${imageObj.alt}">
+      <div class="page-hero-content">
+        ${eyebrow ? `<p class="page-hero-eyebrow">${eyebrow}</p>` : ""}
+        <h1>${title}</h1>
+        ${sub ? `<p class="page-hero-sub">${sub}</p>` : ""}
+      </div>
+    </div>`;
+}
+
 function emptyState(icon, text, actionLabel, actionAttr) {
   return `
     <div class="empty-state">
@@ -148,7 +162,7 @@ function renderDashboard() {
 
   return `
     <section class="view view--dashboard">
-      <div class="hero">
+      <div class="hero hero--photo" style="background-image:url('${imageAssets.dashboardHero.url}')" role="img" aria-label="${imageAssets.dashboardHero.alt}">
         <div class="hero-text">
           <p class="hero-eyebrow">${DateUtil.greeting()}${name}</p>
           <h1>Ready to take care of yourself today?</h1>
@@ -157,10 +171,6 @@ function renderDashboard() {
             <button class="btn btn--primary" id="btnStartToday"><i data-lucide="play"></i> Start Today</button>
             <button class="btn btn--outline" data-view="coach"><i data-lucide="sparkles"></i> Ask AI Coach</button>
           </div>
-        </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="hero-glow hero-glow--blue"></div>
-          <div class="hero-glow hero-glow--purple"></div>
         </div>
       </div>
 
@@ -233,10 +243,7 @@ function renderPlan() {
   const day = Store.getDay(App.dateKey);
   return `
     <section class="view">
-      <div class="view-header">
-        <h1>My Plan</h1>
-        <p>${DateUtil.formatThai(App.dateKey)}</p>
-      </div>
+      ${pageHero(imageAssets.planHero, "MY PLAN", "จัดตารางวันนี้ของคุณ", DateUtil.formatThai(App.dateKey))}
       ${dateNav()}
       <div class="panel">
         <div class="panel-head">
@@ -347,12 +354,7 @@ function renderFood() {
 
   return `
     <section class="view">
-      <div class="view-header view-header--food">
-        <div>
-          <h1>Food</h1>
-          <p>บันทึกมื้ออาหารของวันนี้ ไม่ต้องนับแคลอรี่ เน้นความหลากหลาย</p>
-        </div>
-      </div>
+      ${pageHero(imageAssets.foodHero, "FOOD", "เติมพลังให้ร่างกายพร้อมลุย", "บันทึกมื้ออาหารของวันนี้ ไม่ต้องนับแคลอรี่ เน้นความหลากหลาย", "food")}
       ${dateNav()}
       <div class="tip-banner tip-banner--green"><i data-lucide="lightbulb"></i><span>${tip}</span></div>
 
@@ -367,7 +369,7 @@ function renderFood() {
             : `<div class="food-grid">
                 ${day.food[meal.key].map(f => `
                   <div class="food-card ${f.completed ? "is-done" : ""}">
-                    <div class="food-card-img" style="background-image:url('${f.image || imageAssets.food.url}')"></div>
+                    <div class="food-card-img" style="background-image:url('${f.image || mealDefaultImages[meal.key].url}')"></div>
                     <div class="food-card-body">
                       <div class="food-card-top">
                         <h3>${escapeHtml(f.name)}</h3>
@@ -453,10 +455,7 @@ function renderSleep() {
   const weekKeys = DateUtil.last7Keys(App.dateKey);
   return `
     <section class="view">
-      <div class="view-header">
-        <h1>Sleep</h1>
-        <p>ติดตามการนอนหลับเพื่อสุขภาพที่ดีขึ้น</p>
-      </div>
+      ${pageHero(imageAssets.recoveryHero, "SLEEP & RECOVERY", "พักผ่อนให้เพียงพอ คือส่วนหนึ่งของแผน", "ติดตามการนอนหลับเพื่อสุขภาพที่ดีขึ้น", "calm")}
       ${dateNav()}
       <div class="grid grid--2">
         <div class="panel">
@@ -540,13 +539,24 @@ function computeSleepMinutes(bedTime, wakeTime) {
 // =============================================================================
 function renderWorkout() {
   const day = Store.getDay(App.dateKey);
+  const doneIds = day.workouts.map(w => w.planId);
+  const featured = workoutLibrary.plans.find(p => !doneIds.includes(p.id)) || workoutLibrary.plans[0];
   return `
     <section class="view">
-      <div class="view-header">
-        <h1>Workout</h1>
-        <p>เลือกโปรแกรมที่เหมาะกับวันนี้ ไม่จำเป็นต้องหักโหม</p>
-      </div>
+      ${pageHero(imageAssets.workoutHero, "WORKOUT", "ฝึกวันนี้ให้คุ้มค่า", "เลือกโปรแกรมที่เหมาะกับวันนี้ ไม่จำเป็นต้องหักโหม")}
       ${dateNav()}
+
+      <div class="featured-workout-card featured-workout-card--${featured.color}">
+        <div class="featured-workout-label">TODAY'S WORKOUT</div>
+        <h2>${featured.name}</h2>
+        <div class="featured-workout-stats">
+          <span><i data-lucide="flame"></i> ${featured.estimatedMinutes} นาที</span>
+          <span><i data-lucide="dumbbell"></i> ${featured.exercises.length} Exercises</span>
+          <span><i data-lucide="zap"></i> ${featured.difficulty}</span>
+        </div>
+        <button class="btn btn--primary" data-start-workout="${featured.id}"><i data-lucide="play"></i> เริ่มออกกำลังกาย</button>
+      </div>
+
       <div class="chip-row">
         ${workoutLibrary.categories.map(c => `<span class="chip">${c}</span>`).join("")}
       </div>
@@ -674,10 +684,7 @@ function renderHydration() {
   const pct = Math.min(100, Math.round((day.hydrationMl / day.hydrationGoalMl) * 100));
   return `
     <section class="view">
-      <div class="view-header">
-        <h1>Hydration</h1>
-        <p>ดื่มน้ำให้เพียงพอในแต่ละวัน</p>
-      </div>
+      ${pageHero(imageAssets.hydrationHero, "HYDRATION", "ดื่มน้ำให้เพียงพอในแต่ละวัน", "ร่างกายที่ชุ่มชื้น คือร่างกายที่พร้อมทำงาน", "hydration")}
       ${dateNav()}
       <div class="panel hydration-panel">
         <div class="hydration-ring" style="--pct:${pct}">
@@ -725,7 +732,7 @@ function renderCoach() {
   const history = Store.getChatHistory();
   return `
     <section class="view view--coach">
-      <div class="coach-header">
+      <div class="coach-header" style="background-image:url('${imageAssets.coachVisual.url}')" role="img" aria-label="${imageAssets.coachVisual.alt}">
         <div class="coach-avatar"><i data-lucide="sparkles"></i></div>
         <div>
           <h1>AI Coach</h1>
@@ -803,10 +810,7 @@ function renderTips() {
   const categories = [...new Set(healthTips.map(t => t.category))];
   return `
     <section class="view">
-      <div class="view-header">
-        <h1>Health Tips</h1>
-        <p>เคล็ดลับสุขภาพสั้นๆ นำไปใช้ได้จริง</p>
-      </div>
+      ${pageHero(imageAssets.recoveryHero, "HEALTH TIPS", "เคล็ดลับสั้นๆ ที่นำไปใช้ได้จริง", "อาหาร การนอน การออกกำลังกาย และสุขนิสัยในชีวิตประจำวัน")}
       <div class="chip-row">
         ${categories.map(c => `<span class="chip">${c}</span>`).join("")}
       </div>
@@ -837,10 +841,7 @@ function renderProgress() {
 
   return `
     <section class="view">
-      <div class="view-header">
-        <h1>Progress</h1>
-        <p>ภาพรวมความสม่ำเสมอใน 7 วันที่ผ่านมา</p>
-      </div>
+      ${pageHero(imageAssets.runningHero, "PROGRESS", "ความสม่ำเสมอ คือชัยชนะที่แท้จริง", "ภาพรวมความสม่ำเสมอใน 7 วันที่ผ่านมา")}
       <div class="panel">
         <h2>Weekly Summary</h2>
         <p class="progress-summary">คุณทำกิจกรรมตามแผนได้ ${daysWithActivity} จาก 7 วัน</p>

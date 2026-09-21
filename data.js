@@ -13,26 +13,35 @@
 // regenerate it later without hunting through the codebase.
 // ---------------------------------------------------------------------------
 const imageAssets = {
-  workout: {
-    url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1200&auto=format&fit=crop",
-    prompt: "Premium modern fitness photography of a young adult performing a functional workout in a minimalist dark navy gym, cinematic lighting, blue and cyan accent lights, professional health magazine aesthetic, realistic, clean composition, no text"
-  },
-  food: {
-    url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1200&auto=format&fit=crop",
-    prompt: "Premium healthy meal photography, balanced colorful meal on a dark modern table, natural ingredients, cinematic soft lighting, professional nutrition magazine aesthetic, realistic photography, no text"
-  },
-  sleep: {
-    url: "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop",
-    prompt: "Premium peaceful bedroom at night, dark navy and purple ambient lighting, modern minimal interior, calm atmosphere, professional lifestyle photography, realistic, no text"
-  },
-  lifestyle: {
-    url: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200&auto=format&fit=crop",
-    prompt: "Premium modern healthy lifestyle photography, confident young adult in daylight, minimal navy and white environment, editorial fitness magazine aesthetic, no text"
-  },
-  aiCoach: {
-    url: "https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop",
-    prompt: "Futuristic friendly AI health assistant interface, blue and violet glowing holographic elements, premium dark navy environment, modern technology aesthetic, clean composition, no text"
-  }
+  // Dashboard hero — deadlift, the most dramatic/high-energy shot, sets the tone.
+  dashboardHero: { url: "./images/workout-1.jpg", alt: "นักกีฬากำลังเดดลิฟต์ในฟิตเนส" },
+  // Workout page hero — deadlift again, matches "ยกน้ำหนัก" (weight training) directly.
+  workoutHero: { url: "./images/workout-1.jpg", alt: "นักกีฬากำลังเดดลิฟต์ในฟิตเนส" },
+  // My Plan — dumbbell shot, keeps it visually distinct from the Workout page hero.
+  planHero: { url: "./images/workout-2.jpg", alt: "การฝึกดัมเบลในฟิตเนส" },
+  // Progress page — running, matches the "activity / cardio" feel of progress tracking.
+  runningHero: { url: "./images/running.jpg", alt: "นักวิ่งออกกำลังกายกลางแจ้ง" },
+  // Sleep / Recovery + Health Tips — resting with fitness gear nearby.
+  recoveryHero: { url: "./images/recovery.jpg", alt: "การพักผ่อนหลังออกกำลังกาย" },
+  // AI Coach — subtle side/background visual, never placed over the chat itself.
+  coachVisual: { url: "./images/workout-2.jpg", alt: "บรรยากาศฟิตเนสประกอบหน้า AI Coach" },
+  // Hydration — reuses the recovery shot since it's the only one of the 4 fitness
+  // photos that actually shows a water bottle in frame; framing shifted to feature it.
+  hydrationHero: { url: "./images/recovery.jpg", alt: "ขวดน้ำและอุปกรณ์ออกกำลังกายหลังการฝึก" },
+  // Food — real food photography (Italian spread on a dark table, so it blends
+  // naturally with the dark navy UI instead of a bright white background).
+  foodHero: { url: "./images/food-hero.jpg", alt: "อาหารหลากหลายจัดวางสวยงามบนโต๊ะมืด" }
+};
+
+// ---------------------------------------------------------------------------
+// FOOD TRACKER — default photo shown per meal type until the user attaches
+// their own. Swap any of these in data.js only; app.js/style.css don't change.
+// ---------------------------------------------------------------------------
+const mealDefaultImages = {
+  breakfast: { url: "./images/food-breakfast.jpg", alt: "ผลไม้สดหลากสีสำหรับมื้อเช้า" },
+  lunch: { url: "./images/food-lunch.jpg", alt: "ข้าวไก่ย่างและผักสำหรับมื้อเที่ยง" },
+  dinner: { url: "./images/food-dinner.jpg", alt: "จานอาหารมื้อเย็นแบบครบหมู่" },
+  snack: { url: "./images/food-snack.jpg", alt: "ผักและผลไม้สดสำหรับของว่าง" }
 };
 
 // ---------------------------------------------------------------------------
@@ -46,6 +55,8 @@ const workoutLibrary = {
       name: "Beginner Full Body",
       category: "Strength",
       color: "blue",
+      estimatedMinutes: 20,
+      difficulty: "Intermediate",
       exercises: [
         { name: "Squat", description: "ยืนแยกขากว้างเท่าไหล่ ย่อตัวลงช้าๆ แล้วดันขึ้น", difficulty: "Easy", duration: "12 reps", safetyTip: "หลังตรงเสมอ อย่าให้เข่าเลยปลายเท้ามาก" },
         { name: "Push-up", description: "วางมือกว้างกว่าไหล่เล็กน้อย ลดตัวลงแล้วดันขึ้น", difficulty: "Medium", duration: "10 reps", safetyTip: "ถ้าเมื่อยข้อมือ ให้พักหรือทำแบบชันเข่า" },
@@ -59,6 +70,8 @@ const workoutLibrary = {
       name: "Quick Cardio Burst",
       category: "Cardio",
       color: "cyan",
+      estimatedMinutes: 10,
+      difficulty: "Intermediate",
       exercises: [
         { name: "Jumping Jacks", description: "กระโดดกางแขนกางขาสลับ", difficulty: "Easy", duration: "30 sec", safetyTip: "ลงเท้าเบาๆ ปกป้องข้อเข่า" },
         { name: "High Knees", description: "วิ่งอยู่กับที่ยกเข่าสูง", difficulty: "Medium", duration: "30 sec", safetyTip: "แกนกลางลำตัวเกร็งเล็กน้อย" },
@@ -70,6 +83,8 @@ const workoutLibrary = {
       name: "Morning Mobility Flow",
       category: "Mobility",
       color: "green",
+      estimatedMinutes: 8,
+      difficulty: "Easy",
       exercises: [
         { name: "Cat-Cow Stretch", description: "คุกเข่าโก่งหลังและแอ่นหลังสลับกัน", difficulty: "Easy", duration: "8 reps", safetyTip: "เคลื่อนไหวช้าๆ ตามจังหวะหายใจ" },
         { name: "Hip Circles", description: "ยืนหมุนสะโพกเป็นวงกลม", difficulty: "Easy", duration: "10 รอบ/ข้าง", safetyTip: "หมุนช้าๆ ไม่ต้องฝืน" },
@@ -81,6 +96,8 @@ const workoutLibrary = {
       name: "Evening Flexibility",
       category: "Flexibility",
       color: "purple",
+      estimatedMinutes: 6,
+      difficulty: "Easy",
       exercises: [
         { name: "Forward Fold", description: "ยืนก้มตัวลงเอื้อมมือแตะปลายเท้า", difficulty: "Easy", duration: "30 sec", safetyTip: "งอเข่าเล็กน้อยถ้าหลังตึง" },
         { name: "Seated Hamstring Stretch", description: "นั่งเหยียดขายืดกล้ามเนื้อต้นขาด้านหลัง", difficulty: "Easy", duration: "30 sec/ข้าง", safetyTip: "อย่ากระตุกตัว ยืดค้างนิ่งๆ" }
@@ -91,6 +108,8 @@ const workoutLibrary = {
       name: "10-Minute Walk",
       category: "Daily Activity",
       color: "orange",
+      estimatedMinutes: 10,
+      difficulty: "Easy",
       exercises: [
         { name: "Brisk Walk", description: "เดินเร็วต่อเนื่อง เพิ่มการเคลื่อนไหวระหว่างวัน", difficulty: "Easy", duration: "10 min", safetyTip: "สวมรองเท้าที่เหมาะสม" }
       ]

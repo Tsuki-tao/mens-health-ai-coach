@@ -264,22 +264,75 @@ body::before {
    ============================================================================= */
 .hero {
   position: relative;
-  background: linear-gradient(135deg, rgba(59,130,246,0.14), rgba(139,92,246,0.10));
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 24px;
-  padding: 40px 36px;
+  padding: 44px 40px;
   overflow: hidden;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 24px;
+  display: flex; align-items: center;
+  min-height: 320px;
 }
+.hero--photo {
+  background-size: cover;
+  background-position: center 30%;
+}
+.hero--photo::before {
+  /* dark overlay so headline text stays readable over the photo, per brief §8 */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(17,24,39,0.94) 0%, rgba(17,24,39,0.72) 42%, rgba(17,24,39,0.28) 100%),
+    linear-gradient(0deg, rgba(17,24,39,0.55) 0%, transparent 45%);
+}
+.hero-text { position: relative; z-index: 1; }
 .hero-eyebrow { color: var(--cyan); font-weight: 700; font-size: 13px; letter-spacing: 0.06em; margin: 0 0 10px; }
 .hero-text h1 { font-size: 32px; font-weight: 700; max-width: 520px; line-height: 1.2; }
 .hero-date { color: var(--text-muted); margin: 10px 0 22px; font-size: 14px; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.hero-art { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
-.hero-glow { position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.55; }
-.hero-glow--blue { width: 160px; height: 160px; background: var(--blue); top: 0; right: 20px; }
-.hero-glow--purple { width: 120px; height: 120px; background: var(--purple); bottom: 0; left: 20px; }
+
+/* Compact photo banner reused on Plan / Workout / Progress / Sleep / Tips */
+.page-hero {
+  position: relative;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.08);
+  background-size: cover;
+  background-position: center 35%;
+  min-height: 190px;
+  display: flex;
+  align-items: flex-end;
+  padding: 24px 28px;
+  margin-bottom: 22px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(17,24,39,0.92) 0%, rgba(17,24,39,0.55) 55%, rgba(17,24,39,0.22) 100%);
+}
+.page-hero-content { position: relative; z-index: 1; }
+.page-hero-eyebrow { color: var(--cyan); font-weight: 700; font-size: 11.5px; letter-spacing: 0.08em; margin: 0 0 6px; }
+.page-hero-content h1 { font-size: 22px; font-weight: 700; }
+.page-hero-sub { color: var(--gray-light); font-size: 13.5px; margin: 6px 0 0; }
+/* Sleep/Recovery uses a calmer purple-leaning overlay instead of pure navy */
+.page-hero--calm::before {
+  background: linear-gradient(0deg, rgba(31,20,54,0.92) 0%, rgba(31,20,54,0.55) 55%, rgba(31,20,54,0.2) 100%);
+}
+.page-hero--calm .page-hero-eyebrow { color: var(--purple); }
+/* Food — green-tinted overlay ("fuel your training" framing) */
+.page-hero--food::before {
+  background: linear-gradient(0deg, rgba(15,32,20,0.92) 0%, rgba(15,32,20,0.55) 55%, rgba(15,32,20,0.2) 100%);
+}
+.page-hero--food .page-hero-eyebrow { color: var(--green); }
+/* Hydration — cyan-tinted overlay, framed to keep the water bottle in shot */
+.page-hero--hydration {
+  background-position: 20% 65%;
+}
+.page-hero--hydration::before {
+  background: linear-gradient(0deg, rgba(11,32,38,0.92) 0%, rgba(11,32,38,0.5) 55%, rgba(11,32,38,0.18) 100%);
+}
+.page-hero--hydration .page-hero-eyebrow { color: var(--cyan); }
 
 .stat-card {
   background: rgba(31,41,55,0.55);
@@ -325,7 +378,8 @@ body::before {
   overflow: hidden;
 }
 .food-card.is-done { opacity: 0.6; }
-.food-card-img { height: 100px; background-size: cover; background-position: center; }
+.food-card-img { height: 100px; background-size: cover; background-position: center; transition: transform 0.25s ease; }
+.food-card:hover .food-card-img { transform: scale(1.03); }
 .food-card-body { padding: 12px 14px; }
 .food-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .food-card-top h3 { font-size: 14.5px; font-weight: 600; }
@@ -347,6 +401,23 @@ body::before {
 /* =============================================================================
    WORKOUT
    ============================================================================= */
+.featured-workout-card {
+  background: linear-gradient(135deg, rgba(59,130,246,0.16), rgba(6,182,212,0.08));
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  margin-bottom: 22px;
+}
+.featured-workout-card--cyan { background: linear-gradient(135deg, rgba(6,182,212,0.18), rgba(59,130,246,0.08)); border-color: rgba(6,182,212,0.28); }
+.featured-workout-card--green { background: linear-gradient(135deg, rgba(34,197,94,0.16), rgba(132,204,22,0.08)); border-color: rgba(34,197,94,0.28); }
+.featured-workout-card--purple { background: linear-gradient(135deg, rgba(139,92,246,0.16), rgba(59,130,246,0.06)); border-color: rgba(139,92,246,0.28); }
+.featured-workout-card--orange { background: linear-gradient(135deg, rgba(249,115,22,0.16), rgba(245,158,11,0.08)); border-color: rgba(249,115,22,0.28); }
+.featured-workout-label { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 6px; }
+.featured-workout-card h2 { font-size: 22px; margin-bottom: 14px; }
+.featured-workout-stats { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 18px; font-size: 13.5px; color: var(--gray-light); }
+.featured-workout-stats span { display: flex; align-items: center; gap: 6px; }
+.featured-workout-stats i { width: 16px; height: 16px; color: var(--amber); }
+
 .workout-plan-card {
   background: rgba(31,41,55,0.55);
   border: 1px solid rgba(255,255,255,0.07);
@@ -393,11 +464,29 @@ body::before {
    AI COACH
    ============================================================================= */
 .view--coach { display: flex; flex-direction: column; height: calc(100vh - 64px); max-height: 900px; }
-.coach-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.coach-header {
+  position: relative;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 18px;
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(139,92,246,0.2);
+  background-size: cover;
+  background-position: center 30%;
+  overflow: hidden;
+}
+.coach-header::before {
+  /* subtle photo backdrop only — never behind the chat window itself */
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(17,24,39,0.94) 0%, rgba(30,20,54,0.9) 55%, rgba(30,20,54,0.55) 100%);
+}
+.coach-header > * { position: relative; z-index: 1; }
 .coach-avatar {
   width: 46px; height: 46px; border-radius: 50%;
   background: linear-gradient(135deg, var(--purple), var(--blue));
   display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
 }
 .coach-avatar i { width: 22px; height: 22px; color: white; }
 .coach-header h1 { font-size: 20px; }
@@ -526,9 +615,24 @@ body::before {
   }
   .bnav-item--main.is-active { color: white; }
 
-  .hero { flex-direction: column; text-align: center; padding: 30px 22px; }
+  .hero { flex-direction: column; text-align: center; padding: 30px 22px; min-height: 260px; background-position: center 25%; }
+  .hero--photo::before {
+    background:
+      linear-gradient(180deg, rgba(17,24,39,0.55) 0%, rgba(17,24,39,0.88) 55%, rgba(17,24,39,0.97) 100%);
+  }
   .hero-actions { justify-content: center; }
-  .hero-art { display: none; }
+  .hero-text { width: 100%; }
+  .hero-text h1 { max-width: none; }
+
+  .page-hero { min-height: 140px; padding: 18px 18px; }
+  .page-hero-content h1 { font-size: 19px; }
+
+  .coach-header { padding: 14px 16px; flex-wrap: wrap; }
+  .coach-header .btn { margin-left: 0; width: 100%; justify-content: center; margin-top: 6px; }
+
+  .featured-workout-card { padding: 20px; }
+  .featured-workout-stats { gap: 12px; font-size: 12.5px; }
+
   .grid--4 { grid-template-columns: repeat(2, 1fr); }
   .grid--3 { grid-template-columns: 1fr; }
   .grid--2 { grid-template-columns: 1fr; }
@@ -539,5 +643,8 @@ body::before {
 @media (max-width: 480px) {
   .grid--4 { grid-template-columns: 1fr 1fr; }
   .hero-text h1 { font-size: 24px; }
+  .page-hero { min-height: 120px; }
+  .page-hero-content h1 { font-size: 17px; }
+  .page-hero-sub { display: none; }
   .chat-bubble { max-width: 88%; }
 }
