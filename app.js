@@ -8,6 +8,22 @@
  * localStorage.
  */
 
+/**
+ * Wraps lucide.createIcons() in a try/catch. If the icon library ever fails
+ * to load or throws (e.g. wrong CDN build, network hiccup), this swallows
+ * the error instead of letting it bubble up and abort whatever function
+ * called it — which previously could silently stop chart rendering and
+ * event binding for the rest of that render() call.
+ */
+function safeCreateIcons() {
+  if (!window.lucide || typeof window.lucide.createIcons !== "function") return;
+  try {
+    window.lucide.createIcons();
+  } catch (e) {
+    console.error("Icon rendering failed, continuing without icons:", e);
+  }
+}
+
 const App = {
   view: "dashboard",
   dateKey: DateUtil.todayKey(),
@@ -40,7 +56,7 @@ const App = {
     const enterBtn = document.getElementById("splashEnterBtn");
     if (!splash || !enterBtn) return;
     document.body.classList.add("no-scroll");
-    if (window.lucide) lucide.createIcons();
+    safeCreateIcons();
     const enter = () => {
       splash.classList.add("is-hidden");
       document.body.classList.remove("no-scroll");
@@ -84,7 +100,7 @@ const App = {
       profile: renderProfile
     };
     main.innerHTML = (renderers[this.view] || renderDashboard)();
-    if (window.lucide) lucide.createIcons();
+    safeCreateIcons();
     const afterRenderers = {
       dashboard: bindDashboard,
       plan: bindPlan,
@@ -637,7 +653,7 @@ function renderWorkoutRunner(plan) {
       </div>
     </div>
   `;
-  if (window.lucide) lucide.createIcons();
+  safeCreateIcons();
 
   document.getElementById("btnPauseResume").addEventListener("click", () => {
     toggleWorkoutTimer(plan);
@@ -685,7 +701,7 @@ function finishWorkout(plan) {
         <h2>WORKOUT COMPLETE</h2>
         <p>Duration: ${elapsedMinutes} min · Exercises: ${plan.exercises.length}</p>
       </div>`;
-    if (window.lucide) lucide.createIcons();
+    safeCreateIcons();
   }
   showToast("บันทึกการออกกำลังกายแล้ว 🎉");
   setTimeout(() => App.render(), 1400);
